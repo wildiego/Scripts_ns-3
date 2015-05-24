@@ -5,7 +5,7 @@ SCENARIO="1 2 3 4"
 
 #en vi :set fileformat=unix
 
-echo IP-Aware stats
+echo C-GW stats
 
 pCheck=`which gnuplot`
 if [ -z "$pCheck" ]
@@ -23,6 +23,7 @@ fi
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:bin/
 
+#Define stadistics files
 for scenario in $SCENARIO
 do
 		cd ..
@@ -38,7 +39,7 @@ do
 		touch voip-del-$scenario.txt
 	
 		cd scratch/
-		
+#Run simulations		
 		for times in $TIMES		
 		do
 			echo Scenario $scenario, time $times
