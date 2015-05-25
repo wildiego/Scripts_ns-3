@@ -3,6 +3,12 @@
 TIMES="1 2 3"
 SCENARIO="1 2 3 4"
 
+CODEL="1 2"
+DRF="10 20"
+TGET1="100ms"
+INTV1="10ms"
+TGET2="500ms"
+INTV2="20ms"
 #en vi :set fileformat=unix
 
 echo C-GW stats
@@ -35,23 +41,34 @@ do
 		touch VoIPTh-cdf-$scenario.txt
 		touch VoIPDel-cdf-$scenario.txt		
 		touch FTPDel-cdf-$scenario.txt
-        touch FTPTh-cdf-$scenario.txt
+        	touch FTPTh-cdf-$scenario.txt
 		touch voip-del-$scenario.txt
 	
 		cd scratch/
 #Run simulations		
 		for times in $TIMES		
 		do
-			echo Scenario $scenario, time $times
-			../waf --run "LTE_random --SimTime=60 --VideoSize=5000000 --runt=$times --Scenario=$scenario --FTPRate=2Mbps  --CoreDataRate=100Gbps --numberOfUE=15 --run=$scenario-$times"
-				
-				cd ..
-				python cell.py Cell-$scenario.txt $times 
-				python video.py VideoTh-$scenario.txt $times VideoDel-$scenario.txt
-				python videocdf.py VideoTh-cdf-$scenario.txt $times VideoDel-cdf-$scenario.txt
-				python voip.py VoIPTh-cdf-$scenario.txt  $times VoIPDel-cdf-$scenario.txt voip-del-$scenario.txt
-				python ftp.py FTPTh-cdf-$scenario.txt $times FTPDel-cdf-$scenario.txt
-				cd scratch/
+				for times in $CODEL		
+				do
+					echo Scenario $scenario, time $times, Codel $codel
+					
+					if [ $codel -eq 1]
+					then
+						../waf --run "CGW1 --SimTime=60 --runt=$times --Scenario=$scenario  --CoreDataRate=1000Gbps --numberOfUE=10 --run=$scenario-$times --nRB=25 --DrFactor=20 --Target=$tget1 --Interval=$intv1"	
+
+					else
+						../waf --run "CGW1 --SimTime=60 --runt=$times --Scenario=$scenario  --CoreDataRate=1000Gbps --numberOfUE=10 --run=$scenario-$times --nRB=25 --DrFactor=20 --Target=$tget2 --Interval=$intv2"	
+
+					fi
+					
+					cd ..
+					python cell.py Cell-$scenario.txt $times 
+					python video.py VideoTh-$scenario.txt $times VideoDel-$scenario.txt
+					python videocdf.py VideoTh-cdf-$scenario.txt $times VideoDel-cdf-$scenario.txt
+					python voip.py VoIPTh-cdf-$scenario.txt  $times VoIPDel-cdf-$scenario.txt voip-del-$scenario.txt
+					python ftp.py FTPTh-cdf-$scenario.txt $times FTPDel-cdf-$scenario.txt
+					cd scratch/
+				done
 		done
   
 done
